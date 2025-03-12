@@ -15,13 +15,17 @@
 
         src = ./.;
 
-        dontBuild = true;
+        buildInputs = with pkgs; [ python makeWrapper ronn ];
 
-        buildInputs = with pkgs; [ python makeWrapper ];
+        buildPhase = ''
+          cd man
+          ${pkgs.bash}/bin/bash ./convert-to-man
+        '';
 
         installPhase = ''
+          # Install scripts
           mkdir -p $out/bin
-          cp bin/* $out/bin/
+          cp $src/bin/* $out/bin/
 
           chmod u+x $out/bin/git-bc-cherry-pick
           chmod u+x $out/bin/git-bc-log
@@ -29,6 +33,10 @@
           wrapProgram $out/bin/git-bc-show-eligible --prefix PATH : ${
             lib.makeBinPath [ python ]
           }
+
+          # Install man pages
+          mkdir -p $out/share/man/man1
+          cp man1/* $out/share/man/man1
         '';
       };
 
