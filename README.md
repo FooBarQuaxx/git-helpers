@@ -27,6 +27,36 @@ To install them, checkout this repository somewhere and add the subdirectory
 `bin` in your `$PATH` variable. You can also add the subdirectory `man` to your
 `$MANPATH`, if you want to use `git help <command>`.
 
+It's also possible to install git-helpers as nix flake:
+
+```nix
+
+    git-helpers = { url = "github:FooBarQuaxx/git-helpers/create-flake"; };
+  ( ... )
+  outputs = { self, nixpkgs, git-helpers, ... }:
+    let
+        gitHelpersPkg = inputs.git-helpers.packages.x86_64-linux.default
+    in {
+      nixosConfigurations."my-machine" = nixpkgs.lib.nixosSystem {
+    ( ... )
+        modules = [
+          {
+            nixpkgs.overlays = [
+              (final: prev: {
+                git-helpers = gitHelpersPkg;
+              })
+            ];
+          }
+```
+
+and in your nixos module, add git-helpers to your package list.
+
+```nix
+environment.systemPackages = with pkgs; [
+    git-helpers
+]
+```
+
 Build
 -----
 
